@@ -1,5 +1,6 @@
 package com.techyourchance.mvc.screens.questiondetails;
 
+import android.support.v7.widget.Toolbar;
 import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,21 +10,39 @@ import android.widget.TextView;
 
 import com.techyourchance.mvc.R;
 import com.techyourchance.mvc.questions.QuestionDetails;
-import com.techyourchance.mvc.screens.common.views.BaseViewMvc;
+import com.techyourchance.mvc.screens.common.ViewMvcFactory;
+import com.techyourchance.mvc.screens.common.toolbar.ToolbarViewMvc;
+import com.techyourchance.mvc.screens.common.views.BaseObservableViewMvc;
 
 
-public class QuestionDetailsViewMvcImpl extends BaseViewMvc implements QuestionDetailsViewMvc {
+public class QuestionDetailsViewMvcImpl extends BaseObservableViewMvc<QuestionDetailsViewMvc.Listener> implements QuestionDetailsViewMvc {
 
     private final TextView mTxtQuestionTitle;
     private final TextView mTxtQuestionBody;
     private final ProgressBar mProgressBar;
+    private final Toolbar mToolbar;
+    private final ToolbarViewMvc mToolbarViewMvc;
 
-    public QuestionDetailsViewMvcImpl(LayoutInflater inflater, ViewGroup container) {
+    public QuestionDetailsViewMvcImpl(LayoutInflater inflater, ViewGroup container, ViewMvcFactory viewMvcFactory) {
         setRootView(inflater.inflate(R.layout.layout_question_details, container, false));
 
         mTxtQuestionTitle = findViewById(R.id.txt_question_title);
         mTxtQuestionBody = findViewById(R.id.txt_question_body);
         mProgressBar = findViewById(R.id.progress);
+        mToolbar = findViewById(R.id.toolbar);
+        mToolbarViewMvc = viewMvcFactory.getToolbarViewMvc(mToolbar);
+        mToolbarViewMvc.setTitle(getString(R.string.questions_list_screen_title));
+        mToolbar.addView(mToolbarViewMvc.getRootView());
+
+        mToolbarViewMvc.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                for (Listener listener : getListeners()) {
+                    listener.onBackButtonClicked();
+                }
+            }
+        });
+
     }
 
     @Override
